@@ -3,19 +3,28 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --background: #070F2B;
+  --foreground: #9290C3;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+  
+  /* Space Gradient Background */
+  .bg-space-gradient {
+    background: linear-gradient(135deg, #070F2B 0%, #1B1A55 50%, #535C91 100%);
+  }
+  
+  .glass-panel {
+    @apply bg-space-800/60 backdrop-blur-md border border-space-500/30 shadow-xl;
+  }
 }
