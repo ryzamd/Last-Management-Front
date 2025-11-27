@@ -1,5 +1,5 @@
 export const dashboardStyles = {
-  main: "relative min-h-screen flex flex-col p-6 md:p-12 overflow-hidden",
+  main: "relative min-h-screen flex flex-col p-6 md:p-12 overflow-hidden font-mono",
   
   bgDecor: {
     top: "absolute top-0 left-0 w-96 h-96 bg-space-500/20 rounded-full blur-[100px] -translate-x-1/2 -translate-y-1/2",
@@ -11,35 +11,34 @@ export const dashboardStyles = {
     logoWrapper: "flex items-center gap-4",
     logoIconBox: "w-12 h-12 rounded-xl bg-gradient-to-br from-space-300 to-space-500 flex items-center justify-center shadow-lg shadow-space-500/20",
     logoIcon: "text-space-900 text-2xl",
-    brandName: "text-2xl font-phudu font-bold tracking-wider text-white", // Phudu for Title
+    brandName: "text-2xl font-phudu font-bold tracking-wider text-white",
     
     userSection: "flex items-center gap-4",
-    welcomeText: "hidden md:block text-space-300 font-mono", // Mono for Text
-    username: "font-bold text-white font-grotesk", // Grotesk for highlight/header-like text
+    welcomeText: "hidden md:block text-space-300 font-mono text-sm",
+    username: "font-bold text-white font-grotesk text-base",
     
-    logoutBtn: "flex items-center gap-2 px-4 py-2 rounded-lg border border-red-500/50 text-red-300 hover:bg-red-500/10 transition-colors font-mono text-sm",
-    loginBtn: "group flex items-center gap-2 px-6 py-2.5 rounded-full bg-space-800/80 border border-space-500 text-space-300 hover:text-white hover:border-space-300 transition-all shadow-lg hover:shadow-space-500/20 font-grotesk font-bold",
+    logoutBtn: "flex items-center gap-2 px-4 py-2 rounded-lg border border-red-500/50 text-red-300 hover:bg-red-500/10 transition-colors font-mono text-xs tracking-wide uppercase",
+    loginBtn: "group flex items-center gap-2 px-6 py-2.5 rounded-full bg-space-800/80 border border-space-500 text-space-300 hover:text-white hover:border-space-300 transition-all shadow-lg hover:shadow-space-500/20 font-grotesk font-bold tracking-wide",
   },
 
   content: {
     container: "relative z-10 flex-1 flex flex-col items-center justify-center max-w-5xl mx-auto w-full",
     welcomeSection: "text-center space-y-6 mb-16 animate-in fade-in slide-in-from-bottom-8 duration-700",
-    welcomeTitle: "text-5xl md:text-7xl font-phudu font-bold text-transparent bg-clip-text bg-gradient-to-r from-space-300 via-white to-space-300 pb-2", // Phudu
-    subTitle: "text-xl md:text-2xl text-space-300/80 font-mono font-light", // Mono
+    welcomeTitle: "text-5xl md:text-7xl font-phudu font-bold text-transparent bg-clip-text bg-gradient-to-r from-space-300 via-white to-space-300 pb-2", // Phudu for Big Title
+    subTitle: "text-xl md:text-2xl text-space-300/80 font-mono font-light tracking-tight",
     divider: "h-1 w-24 mx-auto bg-gradient-to-r from-transparent via-space-500 to-transparent",
     
-    actionTitle: "text-center text-lg text-space-500 uppercase tracking-widest mb-8 font-grotesk font-bold", // Grotesk
+    actionTitle: "text-center text-lg text-space-500 uppercase tracking-[0.2em] mb-8 font-grotesk font-bold",
     grid: "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6",
   },
 
   card: {
-    base: (color: string, isGuest: boolean) =>
-      `group relative p-6 rounded-2xl border backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 ${color} ${!isGuest ? "lg:col-span-2 aspect-[2/1]" : ""}`,
+    base: (color: string) => `group relative p-6 rounded-2xl border backdrop-blur-sm transition-all duration-300 hover:-translate-y-2 "lg:col-span-2 aspect-[2/1]" ${color}`,
     inner: "flex flex-col h-full justify-between gap-4",
     iconBox: "p-3 w-fit rounded-lg bg-space-900/50 text-white group-hover:scale-110 transition-transform",
-    title: "text-xl font-grotesk font-bold text-white mb-1 group-hover:text-space-300 transition-colors", // Grotesk
-    desc: "text-sm text-space-300/70 font-mono", // Mono
+    title: "text-xl font-grotesk font-bold text-white mb-1 group-hover:text-space-300 transition-colors",
+    desc: "text-sm text-space-300/70 font-mono leading-relaxed",
   },
 
-  footer: "relative z-10 mt-12 text-center text-space-500 text-sm font-mono"
+  footer: "relative z-10 mt-12 text-center text-space-500 text-xs font-mono tracking-wider"
 };

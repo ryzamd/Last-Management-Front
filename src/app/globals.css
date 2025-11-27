@@ -27,4 +27,23 @@ body {
   .glass-panel {
     @apply bg-space-800/60 backdrop-blur-md border border-space-500/30 shadow-xl;
   }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(27, 26, 85, 0.5); /* space-800 with opacity */
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #535C91; /* space-500 */
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #9290C3; /* space-300 */
+  }
 }

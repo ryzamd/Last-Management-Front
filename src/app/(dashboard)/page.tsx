@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { FaUserAstronaut, FaRocket, FaBoxOpen, FaUsers, FaSitemap, FaRightFromBracket, FaFileInvoiceDollar } from "react-icons/fa6";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -7,8 +7,13 @@ import LoginModal from "@/components/features/auth/LoginModal";
 import { dashboardStyles } from "@/styles/dashboard.styles";
 
 export default function DashboardPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const actions = [
     {
@@ -41,6 +46,10 @@ export default function DashboardPage() {
     },
   ];
 
+  if (!isMounted) {
+      return null; // Hoặc return một loading spinner/skeleton layout tương tự
+  }
+
   return (
     <main className={dashboardStyles.main}>
       <div className={dashboardStyles.bgDecor.top} />
@@ -63,13 +72,13 @@ export default function DashboardPage() {
               </span>
               <button onClick={logout} className={dashboardStyles.header.logoutBtn}>
                 <FaRightFromBracket />
-                Logout
+                LOGOUT
               </button>
             </div>
           ) : (
             <button onClick={() => setIsLoginOpen(true)} className={dashboardStyles.header.loginBtn}>
               <FaUserAstronaut className="group-hover:scale-110 transition-transform" />
-              <span>Admin Login</span>
+              <span>ADMIN LOGIN</span>
             </button>
           )}
         </div>
@@ -88,13 +97,16 @@ export default function DashboardPage() {
           
           <div className={dashboardStyles.content.grid}>
             {actions.map((action, index) => {
-              if (!action.guestAllowed && !isAuthenticated) return null;
+              // Logic:
+              // - Guest sees only "guestAllowed: true" actions
+              // - Admin (isAuthenticated) sees ALL actions
+              //if (!isAuthenticated && !action.guestAllowed) return null;
 
               return (
                 <Link
                   key={index}
                   href={action.href}
-                  className={dashboardStyles.card.base(action.color, isAuthenticated)}
+                  className={dashboardStyles.card.base(action.color)}
                 >
                   <div className={dashboardStyles.card.inner}>
                     <div className={dashboardStyles.card.iconBox}>
