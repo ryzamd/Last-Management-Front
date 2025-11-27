@@ -5,6 +5,7 @@ const config: Config = {
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/styles/**/*.{js,ts,jsx,tsx,mdx}", // Add styles folder
   ],
   theme: {
     extend: {
@@ -19,7 +20,9 @@ const config: Config = {
         },
       },
       fontFamily: {
-        phudu: ["var(--font-phudu)", "sans-serif"],
+        phudu: ["var(--font-phudu)", "sans-serif"], // Title
+        grotesk: ["var(--font-space-grotesk)", "sans-serif"], // Header
+        mono: ["var(--font-space-mono)", "monospace"], // Text
       },
     },
   },
