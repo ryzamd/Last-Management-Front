@@ -67,7 +67,7 @@ export default function CustomerModal({ mode, customer, lastNames, isLoadingDeta
                 <label className={customerStyles.modal.label}>Associated Last Names ({lastNames.length})</label>
                 <div className="bg-space-950 rounded-lg border border-space-800 overflow-hidden mt-2">
                   {isLoadingDetails ? (
-                    <div className="p-4 text-center text-space-500 text-xs font-mono">Loading data...</div>
+                    <div className="p-4 text-center text-space-500 text-xs font-mono">Loading data</div>
                   ) : lastNames.length === 0 ? (
                     <div className="p-4 text-center text-space-500 text-xs font-mono">No records found</div>
                   ) : (

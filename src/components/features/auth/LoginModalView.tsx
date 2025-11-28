@@ -61,7 +61,7 @@ export default function LoginModalView({isOpen, onClose, isLoading, error, form:
             disabled={isLoading}
             className={loginStyles.form.submitBtn(isLoading)}
           >
-            {isLoading ? "Verifying Credentials..." : "Login to Dashboard"}
+            {isLoading ? "Verifying Credentials" : "Login to Dashboard"}
           </button>
         </form>
       </div>
