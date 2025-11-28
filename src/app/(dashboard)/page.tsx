@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaUserAstronaut, FaRocket, FaBoxOpen, FaUsers, FaSitemap, FaRightFromBracket, FaFileInvoiceDollar } from "react-icons/fa6";
+import { FaUserAstronaut, FaRocket, FaBoxOpen, FaUsers, FaSitemap, FaRightFromBracket, FaFileInvoiceDollar, FaTags, FaLocationArrow } from "react-icons/fa6";
 import { useAuthStore } from "@/store/useAuthStore";
 import LoginModal from "@/components/features/auth/LoginModal";
 import { dashboardStyles } from "@/styles/dashboard.styles";
@@ -46,10 +46,17 @@ export default function DashboardPage() {
     },
     {
       label: "Locations",
-      icon: FaUsers,
+      icon: FaLocationArrow,
       href: "/locations",
       guestAllowed: false,
-      color: "bg-yellow-500/20 hover:bg-yellow-500/40 border-yellow-500/50",
+      color: "bg-pink-500/20 hover:bg-pink-500/40 border-pink-500/50",
+    },
+    {
+      label: "Last Names",
+      icon: FaTags,
+      href: "/last-names",
+      guestAllowed: false,
+      color: "bg-cyan-500/20 hover:bg-cyan-500/40 border-cyan-500/50",
     },
   ];
 
