@@ -44,6 +44,13 @@ export default function DashboardPage() {
       guestAllowed: false,
       color: "bg-orange-500/20 hover:bg-orange-500/40 border-orange-500/50",
     },
+    {
+      label: "Locations",
+      icon: FaUsers,
+      href: "/locations",
+      guestAllowed: false,
+      color: "bg-yellow-500/20 hover:bg-yellow-500/40 border-yellow-500/50",
+    },
   ];
 
   if (!isMounted) {
@@ -97,11 +104,6 @@ export default function DashboardPage() {
           
           <div className={dashboardStyles.content.grid}>
             {actions.map((action, index) => {
-              // Logic:
-              // - Guest sees only "guestAllowed: true" actions
-              // - Admin (isAuthenticated) sees ALL actions
-              //if (!isAuthenticated && !action.guestAllowed) return null;
-
               return (
                 <Link
                   key={index}
