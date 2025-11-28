@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Phudu, Space_Grotesk, Space_Mono } from "next/font/google";
 import "./globals.css";
 import clsx from "clsx";
+import ToastContainer from "@/components/ui/ToastContainer";
 
 const phudu = Phudu({
   subsets: ["latin"],
@@ -27,11 +28,7 @@ export const metadata: Metadata = {
   description: "Space Theme Management Dashboard",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({children}: Readonly<{children: React.ReactNode}>) {
   return (
     <html lang="en">
       <body
@@ -43,6 +40,7 @@ export default function RootLayout({
         )}
       >
         {children}
+        <ToastContainer />
       </body>
     </html>
   );

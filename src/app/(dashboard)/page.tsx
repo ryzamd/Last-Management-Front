@@ -47,7 +47,7 @@ export default function DashboardPage() {
   ];
 
   if (!isMounted) {
-      return null; // Hoặc return một loading spinner/skeleton layout tương tự
+      return null;
   }
 
   return (

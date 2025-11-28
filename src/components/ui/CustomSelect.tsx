@@ -36,7 +36,7 @@ export default function CustomSelect({ value, onChange, options, placeholder = "
 
   // Close on click outside & Scroll
   useEffect(() => {
-    function handleEvent(event: Event) {
+    function handleEvent() {
         if(isOpen) setIsOpen(false);
     }
     
@@ -61,16 +61,16 @@ export default function CustomSelect({ value, onChange, options, placeholder = "
   // Render Dropdown qua Portal
   // Chỉ render khi isOpen vả coords đã được tính toán (khác null)
   const dropdownContent = isOpen && coords && (
-    <div 
+    <div
         className={customerStyles.customSelect.dropdown}
-        style={{ 
-            top: coords.top, 
-            left: coords.left, 
+        style={{
+            top: coords.top,
+            left: coords.left,
             width: coords.width,
             position: 'absolute' // Dùng absolute thay cho fixed nếu render vào body để tránh lỗi scroll, nhưng portal thường dùng fixed/absolute tuỳ context. Ở đây style object đã set fixed, ta override inline nếu cần.
             // Tuy nhiên, style object đã có class 'fixed', ta giữ nguyên.
         }}
-        onMouseDown={(e) => e.stopPropagation()} 
+        onMouseDown={(e) => e.stopPropagation()}
     >
       <div className={customerStyles.customSelect.optionsContainer}>
         {options.map((option) => (

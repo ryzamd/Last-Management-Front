@@ -3,7 +3,7 @@ import { useAuthStore } from '@/store/useAuthStore';
 
 // Tạo instance riêng để dễ quản lý config
 const axiosInstance = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL || '/api', // Dùng biến môi trường hoặc proxy path
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -15,12 +15,9 @@ axiosInstance.interceptors.request.use(
     const state = useAuthStore.getState();
     const token = state.user?.token;
 
-    // DEBUG: Kiểm tra xem token có tồn tại trước khi gửi không
-    console.log(`[Axios] Request: ${config.method?.toUpperCase()} ${config.url}`);
-    
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-      // console.log("[Axios] Token attached");
+      config.headers.set('Authorization', `Bearer ${token}`);
+      console.log("[Axios] Token attached:", token.substring(0, 20) + "...");
     } else {
       console.warn("[Axios] Token MISSING");
     }
