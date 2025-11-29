@@ -1,15 +1,24 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaUserAstronaut, FaRocket, FaBoxOpen, FaUsers, FaSitemap, FaRightFromBracket, FaFileInvoiceDollar, FaTags, FaLocationArrow } from "react-icons/fa6";
+import { FaUserAstronaut, FaRocket, FaBoxOpen, FaUsers, FaSitemap, FaRightFromBracket, FaFileInvoiceDollar, FaTags, FaLocationArrow, FaRulerCombined } from "react-icons/fa6";
 import { useAuthStore } from "@/store/useAuthStore";
 import LoginModal from "@/components/features/auth/LoginModal";
 import { dashboardStyles } from "@/styles/dashboard.styles";
+import { useLastSizes } from "@/hooks/useLastSizes";
+import LastSizeModal from "@/components/features/lastSizes/LastSizeModal";
 
 export default function DashboardPage() {
   const [isMounted, setIsMounted] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+
+  const {
+    modalMode, setModalMode,
+    selectedItem,
+    sizeOptions,
+    handleSubmit: handleSizeSubmit
+  } = useLastSizes();
 
   useEffect(() => {
     setIsMounted(true);
@@ -58,11 +67,29 @@ export default function DashboardPage() {
       guestAllowed: false,
       color: "bg-cyan-500/20 hover:bg-cyan-500/40 border-cyan-500/50",
     },
+    {
+      label: "Last Sizes",
+      icon: FaRulerCombined,
+      href: "/last-sizes",
+      guestAllowed: false,
+      color: "bg-fuchsia-500/20 hover:bg-fuchsia-500/40 border-fuchsia-500/50",
+    },
   ];
 
   if (!isMounted) {
       return null;
   }
+
+  const CardContent = ({ icon: Icon, label }: { icon: any, label: string }) => (
+    <div className={dashboardStyles.card.inner}>
+      <div className={dashboardStyles.card.iconBox}>
+        <Icon size={24} />
+      </div>
+      <div>
+        <h4 className={dashboardStyles.card.title}>{label}</h4>
+      </div>
+    </div>
+  );
 
   return (
     <main className={dashboardStyles.main}>
@@ -102,7 +129,7 @@ export default function DashboardPage() {
       <div className={dashboardStyles.content.container}>
         <div className={dashboardStyles.content.welcomeSection}>
           <h2 className={dashboardStyles.content.welcomeTitle}>Welcome Manager</h2>
-          <p className={dashboardStyles.content.subTitle}>Last Management System</p>
+          <p className={dashboardStyles.content.subTitle}>Space Theme Management Dashboard</p>
           <div className={dashboardStyles.content.divider} />
         </div>
 
@@ -111,20 +138,15 @@ export default function DashboardPage() {
           
           <div className={dashboardStyles.content.grid}>
             {actions.map((action, index) => {
+              if (!isAuthenticated && !action.guestAllowed) return null;
+
               return (
                 <Link
                   key={index}
-                  href={action.href}
+                  href={action.href!}
                   className={dashboardStyles.card.base(action.color)}
                 >
-                  <div className={dashboardStyles.card.inner}>
-                    <div className={dashboardStyles.card.iconBox}>
-                      <action.icon size={24} />
-                    </div>
-                    <div>
-                      <h4 className={dashboardStyles.card.title}>{action.label}</h4>
-                    </div>
-                  </div>
+                  <CardContent icon={action.icon} label={action.label} />
                 </Link>
               );
             })}
@@ -137,6 +159,14 @@ export default function DashboardPage() {
       </footer>
 
       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
+
+      <LastSizeModal
+        mode={modalMode}
+        item={selectedItem}
+        sizeOptions={sizeOptions}
+        onClose={() => setModalMode(null)}
+        onSubmit={handleSizeSubmit}
+      />
     </main>
   );
 }
