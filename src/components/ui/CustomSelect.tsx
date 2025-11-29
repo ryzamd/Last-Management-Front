@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { FaChevronDown } from "react-icons/fa6";
 import { customerStyles } from "@/styles/customer.styles";
@@ -19,58 +19,58 @@ export default function CustomSelect({ value, onChange, options, placeholder = "
   const [isOpen, setIsOpen] = useState(false);
   const [coords, setCoords] = useState<{ top: number; left: number; width: number } | null>(null);
   const triggerRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Tính toán vị trí khi mở
-  useEffect(() => {
-    if (isOpen && triggerRef.current) {
+  const updatePosition = useCallback(() => {
+    if (triggerRef.current) {
       const rect = triggerRef.current.getBoundingClientRect();
       setCoords({
         top: rect.bottom + window.scrollY + 4,
         left: rect.left + window.scrollX,
         width: rect.width,
       });
-    } else {
-      setCoords(null); // Reset khi đóng để tránh flash vị trí cũ
     }
-  }, [isOpen]);
+  }, []);
 
-  // Close on click outside & Scroll
   useEffect(() => {
-    function handleEvent() {
-        if(isOpen) setIsOpen(false);
-    }
-    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        triggerRef.current &&
+        !triggerRef.current.contains(event.target as Node) &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
     if (isOpen) {
-        window.addEventListener("resize", handleEvent);
-        window.addEventListener("scroll", handleEvent, true);
-        window.addEventListener("click", (e) => {
-            if (triggerRef.current && !triggerRef.current.contains(e.target as Node)) {
-                setIsOpen(false);
-            }
-        });
+      updatePosition();
+
+      window.addEventListener("resize", updatePosition);
+      window.addEventListener("scroll", updatePosition, true);
+      window.addEventListener("mousedown", handleClickOutside);
     }
 
     return () => {
-        window.removeEventListener("resize", handleEvent);
-        window.removeEventListener("scroll", handleEvent, true);
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+      window.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [isOpen]);
+  }, [isOpen, updatePosition]);
 
   const selectedLabel = options.find(opt => opt.value === value)?.label || placeholder;
 
-  // Render Dropdown qua Portal
-  // Chỉ render khi isOpen vả coords đã được tính toán (khác null)
   const dropdownContent = isOpen && coords && (
     <div
+        ref={dropdownRef}
         className={customerStyles.customSelect.dropdown}
         style={{
             top: coords.top,
             left: coords.left,
             width: coords.width,
-            position: 'absolute' // Dùng absolute thay cho fixed nếu render vào body để tránh lỗi scroll, nhưng portal thường dùng fixed/absolute tuỳ context. Ở đây style object đã set fixed, ta override inline nếu cần.
-            // Tuy nhiên, style object đã có class 'fixed', ta giữ nguyên.
+            position: 'absolute'
         }}
-        onMouseDown={(e) => e.stopPropagation()}
     >
       <div className={customerStyles.customSelect.optionsContainer}>
         {options.map((option) => (
@@ -97,8 +97,8 @@ export default function CustomSelect({ value, onChange, options, placeholder = "
         onClick={() => setIsOpen(!isOpen)}
         className={customerStyles.customSelect.trigger}
       >
-        <span>{selectedLabel}</span>
-        <FaChevronDown className={customerStyles.customSelect.icon(isOpen)} />
+        <span className="truncate pr-2">{selectedLabel}</span>
+        <FaChevronDown className={`shrink-0 ${customerStyles.customSelect.icon(isOpen)}`} />
       </div>
 
       {typeof document !== 'undefined' && createPortal(dropdownContent, document.body)}
