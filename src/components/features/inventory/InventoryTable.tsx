@@ -2,11 +2,7 @@ import { FaPen } from "react-icons/fa6";
 import { InventoryItem } from "@/types/inventory";
 import { inventoryStyles } from "@/styles/inventory.styles";
 
-interface Props {
-  data: InventoryItem[];
-  isAdmin: boolean;
-  onEdit: (item: InventoryItem, e: React.MouseEvent) => void;
-}
+interface Props {data: InventoryItem[]; isAdmin: boolean; onEdit: (item: InventoryItem, e: React.MouseEvent) => void;}
 
 export default function InventoryTable({ data, isAdmin, onEdit }: Props) {
   if (data.length === 0) {

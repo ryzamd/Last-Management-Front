@@ -1,5 +1,5 @@
 export interface InventoryItem {
-  id: string;
+  id?: string;
   lastNameId: string;
   lastSizeId: string;
   locationId: string;
@@ -10,6 +10,12 @@ export interface InventoryItem {
   sizeLabel?: string;
   locationName?: string;
   createdAt?: string;
+}
+
+export interface AdjustStockRequest {
+  quantityChange: number;
+  movementType: 'Purchase' | 'Transfer' | 'Adjustment' | 'Damage' | 'Reserve';
+  reason?: string;
 }
 
 export interface PagedResult<T> {

@@ -4,7 +4,6 @@ import { useInventory } from "@/hooks/useInventory";
 import { inventoryStyles } from "@/styles/inventory.styles";
 import InventoryTable from "@/components/features/inventory/InventoryTable";
 import InventoryModal from "@/components/features/inventory/InventoryModal";
-import AlertModal from "@/components/common/AlertModal";
 import Link from "next/link";
 
 export default function InventoryPage() {
@@ -15,12 +14,11 @@ export default function InventoryPage() {
     pageSize, setPageSize,
     searchTerm, setSearchTerm,
     isAdmin,
-    
+    locationOptions,
+    lastNameOptions,
+    sizeOptions,
     modalMode, setModalMode,
     selectedItem,
-    
-    alertMessage, setAlertMessage,
-    
     handleOpenCreate,
     handleOpenEdit,
     handleSubmit
@@ -98,15 +96,15 @@ export default function InventoryPage() {
         </div>
       </div>
 
-      {/* Modals */}
       <InventoryModal
         mode={modalMode}
         item={selectedItem}
+        locationOptions={locationOptions}
+        lastNameOptions={lastNameOptions}
+        sizeOptions={sizeOptions}
         onClose={() => setModalMode(null)}
         onSubmit={handleSubmit}
       />
-
-      <AlertModal message={alertMessage} onClose={() => setAlertMessage(null)}/>
     </div>
   );
 }

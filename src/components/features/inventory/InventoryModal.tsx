@@ -5,29 +5,20 @@ import { inventoryStyles } from "@/styles/inventory.styles";
 import { InventoryItem } from "@/types/inventory";
 import CustomSelect from "@/components/ui/CustomSelect";
 
+interface Option {value: string; label: string;}
+
 interface Props {
   mode: 'create' | 'edit' | null;
   item: InventoryItem | null;
+  locationOptions: Option[];
+  lastNameOptions: Option[];
+  sizeOptions: Option[];
   onClose: () => void;
   onSubmit: (data: Partial<InventoryItem>) => void;
 }
 
-export default function InventoryModal({ mode, item, onClose, onSubmit }: Props) {
+export default function InventoryModal({ mode, item, locationOptions, lastNameOptions, sizeOptions, onClose, onSubmit }: Props) {
   const { register, handleSubmit, reset, setValue, control } = useForm<InventoryItem>();
-
-  const mockLastNames = [
-    { value: "GUID-1", label: "LN-2024-001 (Nike Air)" },
-    { value: "GUID-2", label: "LN-2024-002 (Adidas Ultra)" },
-  ];
-  const mockSizes = [
-    { value: "GUID-S1", label: "US 8" },
-    { value: "GUID-S2", label: "US 9" },
-    { value: "GUID-S3", label: "US 10" },
-  ];
-  const mockLocations = [
-    { value: "GUID-L1", label: "Warehouse A - Row 1" },
-    { value: "GUID-L2", label: "Warehouse B - Bin 5" },
-  ];
 
   useEffect(() => {
     if (item && mode === 'edit') {
@@ -71,7 +62,12 @@ export default function InventoryModal({ mode, item, onClose, onSubmit }: Props)
                         <label className={inventoryStyles.modal.label}>Last Name (Item)</label>
                         <Controller name="lastNameId" control={control} rules={{ required: true }}
                             render={({ field }) => (
-                                <CustomSelect value={field.value} onChange={field.onChange} options={mockLastNames} placeholder="Select Item" />
+                                <CustomSelect
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  options={lastNameOptions}
+                                  placeholder="Select Item"
+                                />
                             )}
                         />
                     </div>
@@ -79,7 +75,12 @@ export default function InventoryModal({ mode, item, onClose, onSubmit }: Props)
                         <label className={inventoryStyles.modal.label}>Size</label>
                         <Controller name="lastSizeId" control={control} rules={{ required: true }}
                             render={({ field }) => (
-                                <CustomSelect value={field.value} onChange={field.onChange} options={mockSizes} placeholder="Select Size" />
+                                <CustomSelect
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  options={sizeOptions}
+                                  placeholder="Select Size"
+                                />
                             )}
                         />
                     </div>
@@ -89,7 +90,12 @@ export default function InventoryModal({ mode, item, onClose, onSubmit }: Props)
                     <label className={inventoryStyles.modal.label}>Location</label>
                     <Controller name="locationId" control={control} rules={{ required: true }}
                         render={({ field }) => (
-                            <CustomSelect value={field.value} onChange={field.onChange} options={mockLocations} placeholder="Select Warehouse Location" />
+                            <CustomSelect
+                              value={field.value}
+                              onChange={field.onChange}
+                              options={locationOptions}
+                              placeholder="Select Warehouse Location"
+                            />
                         )}
                     />
                 </div>
