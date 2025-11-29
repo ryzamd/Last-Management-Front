@@ -16,7 +16,7 @@ export const useInventory = () => {
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Dropdown Data States
+  // Dropdown Data
   const [locationOptions, setLocationOptions] = useState<{ value: string; label: string }[]>([]);
   const [lastNameOptions, setLastNameOptions] = useState<{ value: string; label: string }[]>([]);
   const [sizeOptions, setSizeOptions] = useState<{ value: string; label: string }[]>([]);
@@ -27,8 +27,9 @@ export const useInventory = () => {
   const [searchTerm, setSearchTerm] = useState("");
 
   // Modal State
-  const [modalMode, setModalMode] = useState<'create' | 'edit' | null>(null);
+  const [modalMode, setModalMode] = useState<'create' | 'edit' | 'adjust' | null>(null);
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Fetch Inventory Data
   const fetchData = useCallback(async (currentPage: number, currentSize: number) => {
@@ -45,34 +46,31 @@ export const useInventory = () => {
         }
   }, []);
 
-  // Fetch Dropdown Data (Master Data)
+  // Fetch Master Data
   const fetchMasterData = useCallback(async () => {
     try {
       const [locRes, nameRes, sizeRes] = await Promise.all([
-        LocationService.getAll(1, 100, undefined, true), // Get active locations
-        LastNameService.getAll(1, 100, undefined, 'Active'), // Get active last names
-        LastSizeService.getAll() // Get all sizes
+        LocationService.getAll(1, 100, undefined, true),
+        LastNameService.getAll(1, 100, undefined, 'Active'),
+        LastSizeService.getAll()
       ]);
 
       setLocationOptions(locRes.items.map(l => ({ value: l.id, label: l.locationName })));
       setLastNameOptions(nameRes.items.map(l => ({ value: l.id, label: `${l.lastCode} - ${l.article}` })));
-      // Note: LastSizeService returns an array directly based on your service definition
       const sizes = Array.isArray(sizeRes) ? sizeRes : (sizeRes as any).items || [];
-      setSizeOptions(sizes.map((s: any) => ({ value: s.id, label: s.sizeLabel })));
+      setSizeOptions(sizes.map((s: any) => ({ value: s.id!, label: s.sizeLabel })));
 
     } catch (error) {
-      console.error("Failed to load master data for inventory", error);
-      // Optional: toast.error("Could not load form options");
+      console.error("Failed to load master data", error);
     }
   }, []);
 
-  // Initial Load
   useEffect(() => {
     fetchData(page, pageSize);
     fetchMasterData();
   }, [fetchData, fetchMasterData, page, pageSize]);
 
-  // Client-side Filtering
+  // Filtering
   const filteredData = useMemo(() => {
     if (!searchTerm) return data;
     const lowerTerm = searchTerm.toLowerCase();
@@ -97,23 +95,40 @@ export const useInventory = () => {
     setModalMode('edit');
   };
 
-  // Refactored: Sử dụng createOrUpdate cho cả 2 trường hợp Create và Edit
+  const handleOpenAdjust = (item: InventoryItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!isAdmin) return;
+    setSelectedItem(item);
+    setModalMode('adjust');
+  };
+
   const handleSubmit = async (formData: Partial<InventoryItem>) => {
     try {
-      // Backend tự động check duplicate để Update hoặc Create mới
       await InventoryService.createOrUpdate(formData);
-      
-      const message = modalMode === 'create' 
-        ? "Stock created successfully!" 
-        : "Stock updated successfully!";
-      
+      const message = modalMode === 'create' ? "Stock created successfully!" : "Stock updated successfully!";
       toast.success(message);
-
       setModalMode(null);
       fetchData(page, pageSize);
-
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Operation failed");
+    }
+  };
+
+  const handleAdjustSubmit = async (id: string, quantityChange: number, type: string, reason: string) => {
+    setIsSubmitting(true);
+    try {
+        await InventoryService.adjustStock(id, {
+            quantityChange,
+            movementType: type as any,
+            reason
+        });
+        toast.success("Stock adjusted successfully!");
+        setModalMode(null);
+        fetchData(page, pageSize);
+    } catch (error: any) {
+        toast.error(error.response?.data?.message || "Adjustment failed");
+    } finally {
+        setIsSubmitting(false);
     }
   };
 
@@ -125,17 +140,16 @@ export const useInventory = () => {
     pageSize, setPageSize,
     searchTerm, setSearchTerm,
     isAdmin,
-    
-    // Dropdown Options
     locationOptions,
     lastNameOptions,
     sizeOptions,
-    
     modalMode, setModalMode,
     selectedItem,
-    
+    isSubmitting,
     handleOpenCreate,
     handleOpenEdit,
-    handleSubmit
+    handleOpenAdjust,
+    handleSubmit,
+    handleAdjustSubmit
   };
 };

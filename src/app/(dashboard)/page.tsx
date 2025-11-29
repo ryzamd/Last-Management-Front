@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaUserAstronaut, FaRocket, FaBoxOpen, FaUsers, FaSitemap, FaRightFromBracket, FaFileInvoiceDollar, FaTags, FaLocationArrow, FaRulerCombined, FaBuilding } from "react-icons/fa6";
+import { FaUserAstronaut, FaRocket, FaBoxOpen, FaUsers, FaSitemap, FaRightFromBracket, FaFileInvoiceDollar, FaTags, FaLocationArrow, FaRulerCombined, FaBuilding, FaArrowDownUpAcrossLine } from "react-icons/fa6";
 import { useAuthStore } from "@/store/useAuthStore";
 import LoginModal from "@/components/features/auth/LoginModal";
 import { dashboardStyles } from "@/styles/dashboard.styles";
@@ -43,41 +43,48 @@ export default function DashboardPage() {
       label: "Inventory",
       icon: FaSitemap,
       href: "/inventory",
-      guestAllowed: false,
+      guestAllowed: true,
       color: "bg-emerald-500/20 hover:bg-emerald-500/40 border-emerald-500/50",
     },
     {
       label: "Customers",
       icon: FaUsers,
       href: "/customers",
-      guestAllowed: false,
+      guestAllowed: true,
       color: "bg-orange-500/20 hover:bg-orange-500/40 border-orange-500/50",
     },
     {
       label: "Locations",
       icon: FaLocationArrow,
       href: "/locations",
-      guestAllowed: false,
+      guestAllowed: true,
       color: "bg-pink-500/20 hover:bg-pink-500/40 border-pink-500/50",
     },
     {
       label: "Last Names",
       icon: FaTags,
       href: "/last-names",
-      guestAllowed: false,
+      guestAllowed: true,
       color: "bg-cyan-500/20 hover:bg-cyan-500/40 border-cyan-500/50",
     },
     {
       label: "Last Sizes",
       icon: FaRulerCombined,
       href: "/last-sizes",
-      guestAllowed: false,
+      guestAllowed: true,
       color: "bg-fuchsia-500/20 hover:bg-fuchsia-500/40 border-fuchsia-500/50",
     },
     {
       label: "Departments",
       icon: FaBuilding,
       href: "/departments",
+      guestAllowed: true,
+      color: "bg-emerald-500/20 hover:bg-emerald-500/40 border-emerald-500/50",
+    },
+    {
+      label: "Stock Movements",
+      icon: FaArrowDownUpAcrossLine,
+      href: "/stock-movements",
       guestAllowed: false,
       color: "bg-emerald-500/20 hover:bg-emerald-500/40 border-emerald-500/50",
     },
@@ -145,7 +152,7 @@ export default function DashboardPage() {
           
           <div className={dashboardStyles.content.grid}>
             {actions.map((action, index) => {
-              if (!isAuthenticated && !action.guestAllowed) return null;
+               if (!isAuthenticated && !action.guestAllowed) return null;
 
               return (
                 <Link

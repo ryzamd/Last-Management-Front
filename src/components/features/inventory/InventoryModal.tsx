@@ -106,15 +106,15 @@ export default function InventoryModal({ mode, item, locationOptions, lastNameOp
                 <div className="grid grid-cols-3 gap-4">
                     <div>
                         <label className={inventoryStyles.modal.label}>Good</label>
-                        <input type="number" {...register("quantityGood", { min: 0 })} className={inventoryStyles.modal.input} />
+                        <input readOnly type="number" {...register("quantityGood", { min: 0 })} className={inventoryStyles.modal.input} />
                     </div>
                     <div>
                         <label className={inventoryStyles.modal.label}>Damaged</label>
-                        <input type="number" {...register("quantityDamaged", { min: 0 })} className={inventoryStyles.modal.input} />
+                        <input readOnly type="number" {...register("quantityDamaged", { min: 0 })} className={inventoryStyles.modal.input} />
                     </div>
                     <div>
                         <label className={inventoryStyles.modal.label}>Reserved</label>
-                        <input type="number" {...register("quantityReserved", { min: 0 })} className={inventoryStyles.modal.input} />
+                        <input readOnly type="number" {...register("quantityReserved", { min: 0 })} className={inventoryStyles.modal.input} />
                     </div>
                 </div>
             </div>

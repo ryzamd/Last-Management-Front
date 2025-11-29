@@ -1,10 +1,16 @@
-import { FaPen } from "react-icons/fa6";
+import { FaPen, FaRightLeft } from "react-icons/fa6";
 import { InventoryItem } from "@/types/inventory";
 import { inventoryStyles } from "@/styles/inventory.styles";
+import { MouseEvent } from "react";
 
-interface Props {data: InventoryItem[]; isAdmin: boolean; onEdit: (item: InventoryItem, e: React.MouseEvent) => void;}
+interface Props {
+  data: InventoryItem[];
+  isAdmin: boolean;
+  onEdit: (item: InventoryItem, e: React.MouseEvent) => void;
+  onAdjust: (item: InventoryItem, e: React.MouseEvent) => void;
+}
 
-export default function InventoryTable({ data, isAdmin, onEdit }: Props) {
+export default function InventoryTable({ data, isAdmin, onEdit, onAdjust }: Props) {
   if (data.length === 0) {
     return (
       <div className={inventoryStyles.table.container}>
@@ -54,8 +60,22 @@ export default function InventoryTable({ data, isAdmin, onEdit }: Props) {
                 {isAdmin && (
                   <td className={inventoryStyles.table.td}>
                     <div className={inventoryStyles.table.actions}>
-                      <button onClick={(e) => onEdit(item, e)} className={inventoryStyles.table.actionBtn('edit')}>
+                      {/* Edit Button (For changing Location/Metadata, not Qty) */}
+                      <button 
+                        onClick={(e) => onEdit(item, e)} 
+                        className={inventoryStyles.table.actionBtn('edit')}
+                        title="Edit Item Details"
+                      >
                         <FaPen />
+                      </button>
+                      
+                      {/* Adjust Button (For changing Quantity with Audit) */}
+                      <button 
+                        onClick={(e) => onAdjust(item, e)} 
+                        className="p-2 rounded-lg transition-colors text-amber-400 hover:bg-amber-500/20"
+                        title="Adjust Stock Level"
+                      >
+                        <FaRightLeft />
                       </button>
                     </div>
                   </td>
