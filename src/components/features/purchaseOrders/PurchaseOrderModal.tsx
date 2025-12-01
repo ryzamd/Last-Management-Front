@@ -1,18 +1,19 @@
 import { PurchaseOrder } from "@/types/purchaseOrder";
 import { purchaseOrderStyles as styles } from "@/styles/purchaseOrder.styles";
-import { FaXmark, FaCheck, FaBan, FaFileSignature } from "react-icons/fa6";
+import { FaXmark, FaCheck, FaBan, FaFileSignature, FaSpinner } from "react-icons/fa6";
 
 interface Props {
   isOpen: boolean;
   order: PurchaseOrder | null;
   isAdmin: boolean;
   isProcessing: boolean;
+  isLoadingData?: boolean;
   onClose: () => void;
   onConfirm: (id: string) => void;
   onDeny: (id: string) => void;
 }
 
-export default function PurchaseOrderModal({ isOpen, order, isAdmin, isProcessing, onClose, onConfirm, onDeny }: Props) {
+export default function PurchaseOrderModal({ isOpen, order, isAdmin, isProcessing, isLoadingData, onClose, onConfirm, onDeny }: Props) {
   if (!isOpen || !order) return null;
 
   const isPending = order.status === 'Pending';
@@ -45,7 +46,7 @@ export default function PurchaseOrderModal({ isOpen, order, isAdmin, isProcessin
             </div>
             <div className={styles.detailModal.infoItem}>
               <div className={styles.detailModal.infoLabel}>Target Location</div>
-              <div className={styles.detailModal.infoValue}>{order.locationName || "N/A"}</div>
+              <div className={styles.detailModal.infoValue}>{order.departmentName || "N/A"}</div>
             </div>
             <div className={styles.detailModal.infoItem}>
               <div className={styles.detailModal.infoLabel}>Status</div>
@@ -71,12 +72,23 @@ export default function PurchaseOrderModal({ isOpen, order, isAdmin, isProcessin
 
           {/* Items Table */}
           <div>
-            <h3 className="text-white font-bold font-grotesk uppercase text-sm mb-2 pl-1">Request Items</h3>
-            <div className="rounded-lg border border-space-800 overflow-hidden">
+            <div className="flex items-center gap-2 mb-2 pl-1">
+                <h3 className="text-white font-bold font-grotesk uppercase text-sm">Request Items</h3>
+                {isLoadingData && <FaSpinner className="animate-spin text-emerald-400 text-xs" />}
+            </div>
+            
+            <div className="rounded-lg border border-space-800 overflow-hidden min-h-[100px] relative">
+                {isLoadingData && (
+                    <div className="absolute inset-0 bg-space-900/60 backdrop-blur-[1px] z-10 flex items-center justify-center">
+                        <span className="text-space-300 text-xs font-mono animate-pulse">Fetching details...</span>
+                    </div>
+                )}
+
                 <table className={styles.detailModal.itemsTable}>
                 <thead className={styles.detailModal.itemsThead}>
                     <tr>
                     <th className={styles.detailModal.itemsTh}>Code</th>
+                    <th className={styles.detailModal.itemsTh}>Model</th>
                     <th className={styles.detailModal.itemsTh}>Size</th>
                     <th className={`${styles.detailModal.itemsTh} text-right`}>Quantity</th>
                     </tr>
@@ -84,8 +96,9 @@ export default function PurchaseOrderModal({ isOpen, order, isAdmin, isProcessin
                 <tbody>
                     {order.items.map((item: any, idx: number) => (
                     <tr key={idx}>
-                        <td className={`${styles.detailModal.itemsTd} font-bold text-white`}>{item.lastCode}</td>
-                        <td className={styles.detailModal.itemsTd}>{item.sizeLabel}</td>
+                        <td className={`${styles.detailModal.itemsTd} font-bold text-white`}>{item.lastCode || "-"}</td>
+                        <td className={styles.detailModal.itemsTd}>{item.modelName || "-"}</td>
+                        <td className={styles.detailModal.itemsTd}>{item.sizeLabel || "-"}</td>
                         <td className={`${styles.detailModal.itemsTd} text-right font-bold text-emerald-400`}>{item.quantityRequested}</td>
                     </tr>
                     ))}
@@ -105,15 +118,15 @@ export default function PurchaseOrderModal({ isOpen, order, isAdmin, isProcessin
             <>
               <button
                 onClick={() => onDeny(order.id)}
-                disabled={isProcessing}
-                className={styles.detailModal.btnDanger}
+                disabled={isProcessing || isLoadingData}
+                className={`${styles.detailModal.btnDanger} disabled:opacity-50`}
               >
                 <FaBan className="inline mr-2" /> Deny
               </button>
               <button
                 onClick={() => onConfirm(order.id)}
-                disabled={isProcessing}
-                className={styles.detailModal.btnPrimary}
+                disabled={isProcessing || isLoadingData}
+                className={`${styles.detailModal.btnPrimary} disabled:opacity-50`}
               >
                 <FaCheck className="inline mr-2" /> Confirm Order
               </button>

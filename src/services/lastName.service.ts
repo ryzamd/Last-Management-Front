@@ -1,5 +1,6 @@
 import axiosInstance from '@/lib/axios';
 import { LastName, PagedResult } from '@/types/lastName';
+import { LastModel } from '@/types/lastModel';
 
 export const LastNameService = {
   getAll: async (page: number, pageSize: number, customerId?: string, status?: string): Promise<PagedResult<LastName>> => {
@@ -30,11 +31,15 @@ export const LastNameService = {
     try {
       await axiosInstance.delete(`/LastNames/${id}`);
     } catch (error: any) {
-      // Xử lý lỗi ràng buộc dữ liệu từ BE (Inventory/Order đã sử dụng Last này)
       if (error.response && error.response.status === 409) {
         throw new Error(error.response.data?.message || "Cannot delete Last Name because it is used in Inventory or Orders.");
       }
       throw error;
     }
+  },
+
+  getModelsByLastName: async (lastNameId: string): Promise<LastModel[]> => {
+    const response = await axiosInstance.get(`/LastNames/${lastNameId}/models`);
+    return response.data;
   }
 };

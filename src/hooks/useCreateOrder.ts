@@ -4,11 +4,9 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useToast } from '@/hooks/useToast';
 import { PurchaseOrderService } from '@/services/purchaseOrder.service';
-import { LocationService } from '@/services/location.service';
-import { DepartmentService } from '@/services/department.service';
 import { LastNameService } from '@/services/lastName.service';
 import { CreatePurchaseOrderRequest, PurchaseOrderItemDto } from '@/types/purchaseOrder';
-import { LastSizeService } from '@/services/lastSize.service';
+import { DepartmentService } from '@/services/department.service';
 
 export const useCreateOrder = () => {
   const router = useRouter();
@@ -20,35 +18,26 @@ export const useCreateOrder = () => {
   const [items, setItems] = useState<PurchaseOrderItemDto[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Dữ liệu cho Dropdown
-  const [locations, setLocations] = useState<{value: string, label: string}[]>([]);
   const [departments, setDepartments] = useState<{value: string, label: string}[]>([]);
+  const [targetDepartments, setTargetDepartments] = useState<{value: string, label: string}[]>([]);
   const [lastNames, setLastNames] = useState<{value: string, label: string, code: string}[]>([]);
-  const [sizes, setSizes] = useState<{value: string, label: string}[]>([]);
 
   // Fetch dữ liệu ban đầu
   useEffect(() => {
     const loadData = async () => {
       try {
-        const [locRes, deptRes, nameRes, sizeRes] = await Promise.all([
-          LocationService.getAll(1, 100, undefined, true),
-          DepartmentService.getAll(),
+        const [deptRes, nameRes] = await Promise.all([
+          DepartmentService.getAll(1, 100),
           LastNameService.getAll(1, 100, undefined, 'Active'),
-          LastSizeService.getAll()
         ]);
 
-        setLocations(locRes.items.map(l => ({ value: l.id, label: l.locationName })));
+        const deptList = deptRes.items;
+        setDepartments(deptList.map(d => ({ value: d.departmentName, label: d.departmentName })));
         
-        // DepartmentService trả về List hay PagedResult?
-        // Giả sử API Department trả về List trực tiếp, nếu là PagedResult thì dùng deptRes.items
-        const deptList = Array.isArray(deptRes) ? deptRes : (deptRes as any).items || [];
-        setDepartments(deptList.map((d: any) => ({ value: d.departmentName, label: d.departmentName })));
+        setTargetDepartments(deptList.map(d => ({ value: d.id, label: d.departmentName })));
 
         setLastNames(nameRes.items.map(l => ({ value: l.id, label: `${l.lastCode} - ${l.article}`, code: l.lastCode })));
         
-        const sizeList = Array.isArray(sizeRes) ? sizeRes : (sizeRes as any).items || [];
-        setSizes(sizeList.map((s: any) => ({ value: s.id!, label: s.sizeLabel })));
-
       } catch (error) {
         console.error("Failed to load dependency data", error);
         toast.error("Could not load form data. Please check connection.");
@@ -57,18 +46,22 @@ export const useCreateOrder = () => {
     loadData();
   }, []);
 
-  // Tự động điền RequestedBy nếu là Admin
   useEffect(() => {
     if (isAuthenticated && user?.username) {
       setValue('requestedBy', user.username);
     }
   }, [isAuthenticated, user, setValue]);
 
-  // Thêm item vào giỏ tạm
   const addItem = (item: PurchaseOrderItemDto) => {
-    const exists = items.some(i => i.lastNameId === item.lastNameId && i.lastSizeId === item.lastSizeId);
+    // Check duplicate: LastName + Model + Size
+    const exists = items.some(i =>
+        i.lastNameId === item.lastNameId &&
+        i.lastModelId === item.lastModelId &&
+        i.lastSizeId === item.lastSizeId
+    );
+    
     if (exists) {
-      toast.warning("This item and size combination is already in the list.");
+      toast.warning("This item configuration is already in the list.");
       return;
     }
     setItems([...items, item]);
@@ -80,7 +73,6 @@ export const useCreateOrder = () => {
     setItems(newItems);
   };
 
-  // Submit đơn hàng
   const onSubmit = async (data: CreatePurchaseOrderRequest) => {
     if (items.length === 0) {
       toast.error("Please add at least one item to the order.");
@@ -98,7 +90,11 @@ export const useCreateOrder = () => {
       toast.success("Purchase Order created successfully!");
       router.push('/purchase-orders');
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to create order");
+        if (error.response?.status === 409 && error.response.data?.message?.includes('not associated')) {
+            toast.error("Error: One of the selected items has unlinked Last Name and Model.");
+        } else {
+            toast.error(error.response?.data?.message || "Failed to create order");
+        }
     } finally {
       setIsSubmitting(false);
     }
@@ -111,11 +107,9 @@ export const useCreateOrder = () => {
     isSubmitting,
     isAuthenticated,
     control,
-    locations,
     departments,
+    targetDepartments,
     lastNames,
-    sizes,
-    
     items,
     addItem,
     removeItem

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { StockMovementService, StockMovementDto } from '@/services/stockMovement.service';
+import { StockMovementService } from '@/services/stockMovement.service';
 import { useToast } from './useToast';
+import { StockMovementDto } from '@/types/stockMovement';
 
 export const useStockMovements = () => {
   const toast = useToast();

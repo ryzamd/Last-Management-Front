@@ -1,16 +1,16 @@
-export interface Location {
+export interface Department {
   id: string;
-  locationCode: string;
-  locationName: string;
-  locationType: 'Production' | 'Development' | 'Quality' | 'Storage'; // Based on typical types
+  departmentCode: string;
+  departmentName: string;
+  departmentType: 'Production' | 'Development' | 'Quality' | 'Storage';
   isActive: boolean;
   createdAt?: string;
 }
 
-export interface LocationFilters {
+export interface DepartmentFilters {
   page: number;
   pageSize: number;
-  locationType?: string;
+  departmentType?: string;
   isActive?: boolean;
 }
 

@@ -21,8 +21,9 @@ export const usePurchaseOrderList = () => {
   // Detail Modal
   const [selectedOrder, setSelectedOrder] = useState<PurchaseOrder | null>(null);
   const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isLoadingDetail, setIsLoadingDetail] = useState(false);
 
-  // Action Modal (Confirm/Deny) - New State
+  // Action Modal (Confirm/Deny)
   const [actionModal, setActionModal] = useState<{
     isOpen: boolean;
     type: 'confirm' | 'deny' | null;
@@ -49,9 +50,21 @@ export const usePurchaseOrderList = () => {
     fetchOrders();
   }, [fetchOrders]);
 
-  const handleOpenDetail = (order: PurchaseOrder) => {
-    setSelectedOrder(order);
+  const handleOpenDetail = async (order: PurchaseOrder) => {
     setIsDetailOpen(true);
+    setIsLoadingDetail(true);
+    
+    setSelectedOrder(order);
+
+    try {
+        const fullOrder = await PurchaseOrderService.getById(order.id);
+        setSelectedOrder(fullOrder);
+    } catch (error) {
+        console.error("Failed to load order details", error);
+        toast.error("Failed to load full details");
+    } finally {
+        setIsLoadingDetail(false);
+    }
   };
 
   const handleCloseDetail = () => {
@@ -59,13 +72,11 @@ export const usePurchaseOrderList = () => {
     setIsDetailOpen(false);
   };
 
-  // Trigger mở modal Confirm
   const handleConfirm = (id: string) => {
     if (!isAdmin) return;
     setActionModal({ isOpen: true, type: 'confirm', orderId: id });
   };
 
-  // Trigger mở modal Deny
   const handleDeny = (id: string) => {
     if (!isAdmin) return;
     setActionModal({ isOpen: true, type: 'deny', orderId: id });
@@ -75,7 +86,6 @@ export const usePurchaseOrderList = () => {
     setActionModal({ isOpen: false, type: null, orderId: null });
   };
 
-  // Xử lý submit từ Modal
   const handleSubmitAction = async (reason?: string) => {
     const { type, orderId } = actionModal;
     if (!orderId || !type) return;
@@ -91,8 +101,8 @@ export const usePurchaseOrderList = () => {
       }
       
       handleCloseActionModal();
-      handleCloseDetail(); // Đóng luôn detail nếu đang mở
-      fetchOrders(); // Refresh list
+      handleCloseDetail();
+      fetchOrders();
     } catch (error: any) {
       toast.error(error.message || `Failed to ${type} order`);
     } finally {
@@ -108,14 +118,11 @@ export const usePurchaseOrderList = () => {
     pageSize, setPageSize,
     statusFilter, setStatusFilter,
     isAdmin,
-    
     selectedOrder,
     isDetailOpen,
-    
-    // Exposed for Action Modal
+    isLoadingDetail,
     actionModal,
     isProcessing,
-    
     handleOpenDetail,
     handleCloseDetail,
     handleConfirm,

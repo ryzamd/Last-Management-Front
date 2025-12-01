@@ -1,15 +1,16 @@
 "use client";
 import { FaMagnifyingGlass, FaPlus, FaRocket } from "react-icons/fa6";
-import { useDepartments } from "@/hooks/useDepartments";
-import { departmentStyles as styles } from "@/styles/department.styles";
-import DepartmentTable from "@/components/features/departments/DepartmentTable";
-import DepartmentModal from "@/components/features/departments/DepartmentModal";
+import { useLastModels } from "@/hooks/useLastModels";
+import { lastModelStyles as styles } from "@/styles/lastModel.styles";
+import LastModelTable from "@/components/features/lastModels/LastModelTable";
+import LastModelModal from "@/components/features/lastModels/LastModelModal";
+import ModelAssociationModal from "@/components/features/lastModels/ModelAssociationModal";
 import AlertModal from "@/components/common/AlertModal";
 import Link from "next/link";
 
-export default function DepartmentsPage() {
+export default function LastModelsPage() {
   const {
-    departments,
+    models,
     total,
     page, setPage,
     pageSize, setPageSize,
@@ -17,12 +18,18 @@ export default function DepartmentsPage() {
     isAdmin,
     modalMode, setModalMode,
     selectedItem,
+    linkedLastNames,
+    availableLastNames,
+    isLinking,
     alertMessage, setAlertMessage,
     handleOpenCreate,
     handleOpenEdit,
     handleDelete,
-    handleSubmit
-  } = useDepartments();
+    handleSubmit,
+    handleOpenAssociate,
+    handleLinkLastName,
+    handleUnlinkLastName
+  } = useLastModels();
 
   const totalPages = Math.ceil(total / pageSize);
 
@@ -41,7 +48,7 @@ export default function DepartmentsPage() {
       {/* 2. Table Header */}
       <div className={styles.tableHeader.container}>
         <div className={styles.tableHeader.titleWrapper}>
-          <h1 className={styles.tableHeader.title}>DEPARTMENTS</h1>
+          <h1 className={styles.tableHeader.title}>LAST MODELS</h1>
         </div>
         
         <div className={styles.tableHeader.actions}>
@@ -49,7 +56,7 @@ export default function DepartmentsPage() {
             <FaMagnifyingGlass className={styles.tableHeader.searchIcon} />
             <input
               type="text"
-              placeholder="Search by name, code..."
+              placeholder="Search models..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className={styles.tableHeader.searchInput}
@@ -65,11 +72,12 @@ export default function DepartmentsPage() {
       </div>
 
       {/* Table */}
-      <DepartmentTable
-        data={departments}
+      <LastModelTable
+        data={models}
         isAdmin={isAdmin}
         onEdit={handleOpenEdit}
         onDelete={handleDelete}
+        onAssociate={handleOpenAssociate}
       />
 
       {/* Pagination */}
@@ -97,11 +105,24 @@ export default function DepartmentsPage() {
       </div>
 
       {/* Modals */}
-      <DepartmentModal
-        mode={modalMode}
+      {/* Create / Edit Modal */}
+      <LastModelModal
+        mode={modalMode === 'create' || modalMode === 'edit' ? modalMode : null}
         item={selectedItem}
         onClose={() => setModalMode(null)}
         onSubmit={handleSubmit}
+      />
+
+      {/* Association Modal */}
+      <ModelAssociationModal
+        isOpen={modalMode === 'associate'}
+        model={selectedItem}
+        linkedLastNames={linkedLastNames}
+        availableLastNames={availableLastNames}
+        isLinking={isLinking}
+        onClose={() => setModalMode(null)}
+        onLink={handleLinkLastName}
+        onUnlink={handleUnlinkLastName}
       />
 
       <AlertModal message={alertMessage} onClose={() => setAlertMessage(null)}/>

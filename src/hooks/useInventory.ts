@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { InventoryService } from '@/services/inventory.service';
-import { LocationService } from '@/services/location.service';
+import { DepartmentService } from '@/services/department.service';
 import { LastNameService } from '@/services/lastName.service';
-import { LastSizeService } from '@/services/lastSize.service';
 import { InventoryItem } from '@/types/inventory';
 import { useAuthStore } from '@/store/useAuthStore';
 import { useToast } from './useToast';
@@ -16,10 +15,8 @@ export const useInventory = () => {
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Dropdown Data
-  const [locationOptions, setLocationOptions] = useState<{ value: string; label: string }[]>([]);
+  const [departmentOptions, setDepartmentOptions] = useState<{ value: string; label: string }[]>([]);
   const [lastNameOptions, setLastNameOptions] = useState<{ value: string; label: string }[]>([]);
-  const [sizeOptions, setSizeOptions] = useState<{ value: string; label: string }[]>([]);
 
   // Filter State
   const [page, setPage] = useState(1);
@@ -46,19 +43,16 @@ export const useInventory = () => {
         }
   }, []);
 
-  // Fetch Master Data
+  // Fetch Master Data (Departments & LastNames)
   const fetchMasterData = useCallback(async () => {
     try {
-      const [locRes, nameRes, sizeRes] = await Promise.all([
-        LocationService.getAll(1, 100, undefined, true),
-        LastNameService.getAll(1, 100, undefined, 'Active'),
-        LastSizeService.getAll()
+      const [deptRes, nameRes] = await Promise.all([
+        DepartmentService.getAll(1, 100, undefined, true),
+        LastNameService.getAll(1, 100, undefined, 'Active')
       ]);
 
-      setLocationOptions(locRes.items.map(l => ({ value: l.id, label: l.locationName })));
+      setDepartmentOptions(deptRes.items.map(d => ({ value: d.id, label: d.departmentName })));
       setLastNameOptions(nameRes.items.map(l => ({ value: l.id, label: `${l.lastCode} - ${l.article}` })));
-      const sizes = Array.isArray(sizeRes) ? sizeRes : (sizeRes as any).items || [];
-      setSizeOptions(sizes.map((s: any) => ({ value: s.id!, label: s.sizeLabel })));
 
     } catch (error) {
       console.error("Failed to load master data", error);
@@ -76,8 +70,9 @@ export const useInventory = () => {
     const lowerTerm = searchTerm.toLowerCase();
     return data.filter(item =>
         (item.lastCode?.toLowerCase().includes(lowerTerm) || false) ||
+        (item.modelName?.toLowerCase().includes(lowerTerm) || false) ||
         (item.sizeLabel?.toLowerCase().includes(lowerTerm) || false) ||
-        (item.locationName?.toLowerCase().includes(lowerTerm) || false)
+        (item.departmentName?.toLowerCase().includes(lowerTerm) || false)
     );
   }, [data, searchTerm]);
 
@@ -110,7 +105,11 @@ export const useInventory = () => {
       setModalMode(null);
       fetchData(page, pageSize);
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Operation failed");
+        if (error.response?.status === 409 && error.response.data?.message?.includes('not associated')) {
+            toast.error("Error: This Last Name and Model are not linked yet. Please link them in 'Last Models' page first.");
+        } else {
+            toast.error(error.response?.data?.message || "Operation failed");
+        }
     }
   };
 
@@ -140,9 +139,8 @@ export const useInventory = () => {
     pageSize, setPageSize,
     searchTerm, setSearchTerm,
     isAdmin,
-    locationOptions,
+    departmentOptions,
     lastNameOptions,
-    sizeOptions,
     modalMode, setModalMode,
     selectedItem,
     isSubmitting,

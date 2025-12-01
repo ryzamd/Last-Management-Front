@@ -24,7 +24,6 @@ export default function PurchaseOrderTable({ data, onView }: Props) {
             <th className={styles.tableContainer.th}>Order No.</th>
             <th className={styles.tableContainer.th}>Requested By</th>
             <th className={styles.tableContainer.th}>Department</th>
-            <th className={styles.tableContainer.th}>Location</th>
             <th className={styles.tableContainer.th}>Date</th>
             <th className={styles.tableContainer.th}>Status</th>
             <th className={`${styles.tableContainer.th} text-right`}>Action</th>
@@ -36,7 +35,6 @@ export default function PurchaseOrderTable({ data, onView }: Props) {
               <td className={styles.tableContainer.tdBold}>{order.orderNumber}</td>
               <td className={styles.tableContainer.td}>{order.requestedBy}</td>
               <td className={styles.tableContainer.td}>{order.department}</td>
-              <td className={styles.tableContainer.td}>{order.locationName || "N/A"}</td>
               <td className={styles.tableContainer.td}>
                 {new Date(order.createdAt).toLocaleDateString()}
               </td>

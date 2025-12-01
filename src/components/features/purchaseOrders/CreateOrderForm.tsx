@@ -13,10 +13,9 @@ export default function CreateOrderForm() {
     errors,
     isSubmitting,
     isAuthenticated,
-    locations,
+    targetDepartments,
     departments,
     lastNames,
-    sizes,
     items,
     control,
     addItem,
@@ -54,9 +53,9 @@ export default function CreateOrderForm() {
               {errors.requestedBy && <p className={styles.inputGroup.error}>{errors.requestedBy.message}</p>}
             </div>
 
-            {/* Department */}
+            {/* Department (Text/Select) */}
             <div className={styles.inputGroup.wrapper}>
-              <label className={styles.inputGroup.label}>Department</label>
+              <label className={styles.inputGroup.label}>Requesting Department</label>
               <Controller
                 name="department"
                 control={control}
@@ -66,30 +65,30 @@ export default function CreateOrderForm() {
                     value={field.value}
                     onChange={field.onChange}
                     options={departments}
-                    placeholder="Select Department"
+                    placeholder="Select or Type Department"
                   />
                 )}
               />
               {errors.department && <p className={styles.inputGroup.error}>{errors.department.message}</p>}
             </div>
 
-            {/* Location */}
+            {/* Target Department*/}
             <div className={`${styles.inputGroup.wrapper} md:col-span-2`}>
-              <label className={styles.inputGroup.label}>Target Location</label>
+              <label className={styles.inputGroup.label}>Target Department</label>
               <Controller
-                name="locationId"
+                name="departmentId"
                 control={control}
-                rules={{ required: "Location is required" }}
+                rules={{ required: "Target Department is required" }}
                 render={({ field }) => (
                   <CustomSelect
                     value={field.value}
                     onChange={field.onChange}
-                    options={locations}
-                    placeholder="Select Warehouse / Location"
+                    options={targetDepartments}
+                    placeholder="Select Department"
                   />
                 )}
               />
-              {errors.locationId && <p className={styles.inputGroup.error}>{errors.locationId.message}</p>}
+              {errors.departmentId && <p className={styles.inputGroup.error}>{errors.departmentId.message}</p>}
             </div>
           </div>
         </div>
@@ -103,7 +102,6 @@ export default function CreateOrderForm() {
           
           <OrderItemsEditor
               lastNames={lastNames}
-              sizes={sizes}
               items={items}
               onAdd={addItem}
               onRemove={removeItem}

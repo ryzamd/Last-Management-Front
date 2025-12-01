@@ -1,15 +1,17 @@
 export interface PurchaseOrderItemDto {
   lastNameId: string;
+  lastModelId: string;
   lastSizeId: string;
   quantityRequested: number;
   lastCode?: string;
+  modelName?: string;
   sizeLabel?: string;
 }
 
 export interface CreatePurchaseOrderRequest {
   requestedBy: string;
   department: string;
-  locationId: string;
+  departmentId: string;
   items: PurchaseOrderItemDto[];
 }
 
@@ -18,10 +20,10 @@ export interface PurchaseOrder {
   orderNumber: string;
   requestedBy: string;
   department: string;
-  locationId: string;
-  locationName?: string;
+  departmentId: string;
+  departmentName?: string;
   status: 'Pending' | 'Confirmed' | 'Denied';
-  items: any[];
+  items: PurchaseOrderItemDto[];
   createdAt: string;
   reviewedBy?: string;
   reviewedAt?: string;

@@ -1,7 +1,6 @@
 import { FaPen, FaRightLeft } from "react-icons/fa6";
 import { InventoryItem } from "@/types/inventory";
 import { inventoryStyles } from "@/styles/inventory.styles";
-import { MouseEvent } from "react";
 
 interface Props {
   data: InventoryItem[];
@@ -26,8 +25,9 @@ export default function InventoryTable({ data, isAdmin, onEdit, onAdjust }: Prop
           <thead className={inventoryStyles.table.thead}>
             <tr>
               <th className={inventoryStyles.table.thSku}>Code (Last)</th>
+              <th className={inventoryStyles.table.thName}>Model</th>
               <th className={inventoryStyles.table.thSku}>Size</th>
-              <th className={inventoryStyles.table.thName}>Location</th>
+              <th className={inventoryStyles.table.thName}>Department</th>
               <th className={inventoryStyles.table.thQty}>Good</th>
               <th className={inventoryStyles.table.thQty}>Damaged</th>
               <th className={inventoryStyles.table.thQty}>Reserved</th>
@@ -40,8 +40,9 @@ export default function InventoryTable({ data, isAdmin, onEdit, onAdjust }: Prop
                 <td className={inventoryStyles.table.td}>
                   <span className="font-bold text-white font-grotesk">{item.lastCode || "N/A"}</span>
                 </td>
+                <td className={inventoryStyles.table.td}>{item.modelName || "-"}</td>
                 <td className={inventoryStyles.table.td}>{item.sizeLabel || "N/A"}</td>
-                <td className={inventoryStyles.table.td}>{item.locationName || "N/A"}</td>
+                <td className={inventoryStyles.table.td}>{item.departmentName || "N/A"}</td>
                 
                 <td className={inventoryStyles.table.tdNumber}>
                     <span className="text-emerald-400 font-bold">{item.quantityGood}</span>
@@ -60,18 +61,16 @@ export default function InventoryTable({ data, isAdmin, onEdit, onAdjust }: Prop
                 {isAdmin && (
                   <td className={inventoryStyles.table.td}>
                     <div className={inventoryStyles.table.actions}>
-                      {/* Edit Button (For changing Location/Metadata, not Qty) */}
-                      <button 
-                        onClick={(e) => onEdit(item, e)} 
+                      <button
+                        onClick={(e) => onEdit(item, e)}
                         className={inventoryStyles.table.actionBtn('edit')}
                         title="Edit Item Details"
                       >
                         <FaPen />
                       </button>
                       
-                      {/* Adjust Button (For changing Quantity with Audit) */}
-                      <button 
-                        onClick={(e) => onAdjust(item, e)} 
+                      <button
+                        onClick={(e) => onAdjust(item, e)}
                         className="p-2 rounded-lg transition-colors text-amber-400 hover:bg-amber-500/20"
                         title="Adjust Stock Level"
                       >

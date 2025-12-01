@@ -1,17 +1,12 @@
 import axiosInstance from '@/lib/axios';
-
-export interface LastSize {
-  id?: string;
-  sizeValue: number;
-  sizeLabel: string;
-  status: 'Active' | 'Inactive';
-  replacementSizeId?: string;
-  replacementSizeLabel?: string;
-}
+import { LastSize } from '@/types/lastSize';
 
 export const LastSizeService = {
-  getAll: async (): Promise<LastSize[]> => {
-    const response = await axiosInstance.get('/LastSizes');
+  getAll: async (lastNameId?: string): Promise<LastSize[]> => {
+    const params: any = {};
+    if (lastNameId) params.lastNameId = lastNameId;
+
+    const response = await axiosInstance.get('/LastSizes', { params });
     return response.data;
   },
 

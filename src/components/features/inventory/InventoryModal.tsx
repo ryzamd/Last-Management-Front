@@ -1,30 +1,74 @@
 import { Controller, useForm } from "react-hook-form";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FaXmark } from "react-icons/fa6";
 import { inventoryStyles } from "@/styles/inventory.styles";
 import { InventoryItem } from "@/types/inventory";
 import CustomSelect from "@/components/ui/CustomSelect";
+import { LastSizeService } from "@/services/lastSize.service";
+import { LastNameService } from "@/services/lastName.service";
 
 interface Option {value: string; label: string;}
 
 interface Props {
   mode: 'create' | 'edit' | null;
   item: InventoryItem | null;
-  locationOptions: Option[];
+  departmentOptions: Option[];
   lastNameOptions: Option[];
-  sizeOptions: Option[];
   onClose: () => void;
   onSubmit: (data: Partial<InventoryItem>) => void;
 }
 
-export default function InventoryModal({ mode, item, locationOptions, lastNameOptions, sizeOptions, onClose, onSubmit }: Props) {
-  const { register, handleSubmit, reset, setValue, control } = useForm<InventoryItem>();
+export default function InventoryModal({ mode, item, departmentOptions, lastNameOptions, onClose, onSubmit }: Props) {
+  const { register, handleSubmit, reset, setValue, control, watch } = useForm<InventoryItem>();
+  
+  // Dynamic Options State
+  const [modelOptions, setModelOptions] = useState<Option[]>([]);
+  const [sizeOptions, setSizeOptions] = useState<Option[]>([]);
+  const [isLoadingModels, setIsLoadingModels] = useState(false);
+  const [isLoadingSizes, setIsLoadingSizes] = useState(false);
+
+  // Watch lastNameId change to trigger cascading fetch
+  const selectedLastNameId = watch("lastNameId");
+
+  // Fetch Models & Sizes when LastName changes
+  useEffect(() => {
+    const fetchDependencies = async () => {
+        if (!selectedLastNameId) {
+            setModelOptions([]);
+            setSizeOptions([]);
+            return;
+        }
+
+        setIsLoadingModels(true);
+        setIsLoadingSizes(true);
+
+        try {
+            // Fetch Models linked to this LastName
+            const models = await LastNameService.getModelsByLastName(selectedLastNameId);
+            setModelOptions(models.map(m => ({ value: m.id!, label: m.modelName })));
+
+            // Fetch Sizes belonging to this LastName
+            const sizes = await LastSizeService.getAll(selectedLastNameId);
+            setSizeOptions(sizes.map(s => ({ value: s.id!, label: s.sizeLabel })));
+
+        } catch (error) {
+            console.error("Failed to load dependency data", error);
+        } finally {
+            setIsLoadingModels(false);
+            setIsLoadingSizes(false);
+        }
+    };
+
+    fetchDependencies();
+  }, [selectedLastNameId]);
+
 
   useEffect(() => {
     if (item && mode === 'edit') {
+      setValue("departmentId", item.departmentId);
       setValue("lastNameId", item.lastNameId);
+      setValue("lastModelId", item.lastModelId);
       setValue("lastSizeId", item.lastSizeId);
-      setValue("locationId", item.locationId);
       setValue("quantityGood", item.quantityGood);
       setValue("quantityDamaged", item.quantityDamaged);
       setValue("quantityReserved", item.quantityReserved);
@@ -57,44 +101,70 @@ export default function InventoryModal({ mode, item, locationOptions, lastNameOp
             <div className={inventoryStyles.modal.groupContainer}>
                 <h3 className={inventoryStyles.modal.groupTitle('emerald')}>Item Details</h3>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className={inventoryStyles.modal.label}>Last Name (Item)</label>
-                        <Controller name="lastNameId" control={control} rules={{ required: true }}
-                            render={({ field }) => (
-                                <CustomSelect
-                                  value={field.value}
-                                  onChange={field.onChange}
-                                  options={lastNameOptions}
-                                  placeholder="Select Item"
-                                />
-                            )}
-                        />
-                    </div>
-                    <div>
-                        <label className={inventoryStyles.modal.label}>Size</label>
-                        <Controller name="lastSizeId" control={control} rules={{ required: true }}
-                            render={({ field }) => (
-                                <CustomSelect
-                                  value={field.value}
-                                  onChange={field.onChange}
-                                  options={sizeOptions}
-                                  placeholder="Select Size"
-                                />
-                            )}
-                        />
-                    </div>
-                </div>
-
-                <div>
-                    <label className={inventoryStyles.modal.label}>Location</label>
-                    <Controller name="locationId" control={control} rules={{ required: true }}
+                {/* Department Selection */}
+                <div className="mb-4">
+                    <label className={inventoryStyles.modal.label}>Department</label>
+                    <Controller name="departmentId" control={control} rules={{ required: true }}
                         render={({ field }) => (
                             <CustomSelect
                               value={field.value}
                               onChange={field.onChange}
-                              options={locationOptions}
-                              placeholder="Select Warehouse Location"
+                              options={departmentOptions}
+                              placeholder="Select Department"
+                            />
+                        )}
+                    />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Last Name Selection */}
+                    <div>
+                        <label className={inventoryStyles.modal.label}>Last Name</label>
+                        <Controller name="lastNameId" control={control} rules={{ required: true }}
+                            render={({ field }) => (
+                                <CustomSelect
+                                  value={field.value}
+                                  onChange={(val) => {
+                                      field.onChange(val);
+                                      setValue("lastModelId", "");
+                                      setValue("lastSizeId", "");
+                                  }}
+                                  options={lastNameOptions}
+                                  placeholder="Select Last Name"
+                                />
+                            )}
+                        />
+                    </div>
+
+                    {/* Model Selection (New) */}
+                    <div>
+                        <label className={inventoryStyles.modal.label}>Model</label>
+                        <Controller name="lastModelId" control={control} rules={{ required: true }}
+                            render={({ field }) => (
+                                <CustomSelect
+                                  value={field.value}
+                                  onChange={field.onChange}
+                                  options={modelOptions}
+                                  placeholder={isLoadingModels ? "Loading..." : "Select Model"}
+                                />
+                            )}
+                        />
+                        {modelOptions.length === 0 && selectedLastNameId && !isLoadingModels && (
+                            <p className="text-red-400 text-xs mt-1">No models linked to this Last Name.</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Size Selection */}
+                <div className="mt-4">
+                    <label className={inventoryStyles.modal.label}>Size</label>
+                    <Controller name="lastSizeId" control={control} rules={{ required: true }}
+                        render={({ field }) => (
+                            <CustomSelect
+                              value={field.value}
+                              onChange={field.onChange}
+                              options={sizeOptions}
+                              placeholder={isLoadingSizes ? "Loading" : "Select Size"}
                             />
                         )}
                     />

@@ -1,24 +1,16 @@
 "use client";
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { FaUserAstronaut, FaRocket, FaBoxOpen, FaUsers, FaSitemap, FaRightFromBracket, FaFileInvoiceDollar, FaTags, FaLocationArrow, FaRulerCombined, FaBuilding, FaArrowDownUpAcrossLine } from "react-icons/fa6";
-import { useAuthStore } from "@/store/useAuthStore";
+import { FaUserAstronaut, FaRocket, FaBoxOpen, FaUsers, FaSitemap, FaRightFromBracket, FaFileInvoiceDollar, FaTags, FaRulerCombined, FaBuilding, FaArrowDownUpAcrossLine, FaCube } from "react-icons/fa6";
+import { useAuthStore } from '@/store/useAuthStore';
 import LoginModal from "@/components/features/auth/LoginModal";
 import { dashboardStyles } from "@/styles/dashboard.styles";
-import { useLastSizes } from "@/hooks/useLastSizes";
-import LastSizeModal from "@/components/features/lastSizes/LastSizeModal";
+import InventoryMatrixTable from "@/components/features/reports/InventoryMatrixTable";
 
 export default function DashboardPage() {
   const [isMounted, setIsMounted] = useState(false);
   const { user, isAuthenticated, logout } = useAuthStore();
   const [isLoginOpen, setIsLoginOpen] = useState(false);
-
-  const {
-    modalMode, setModalMode,
-    selectedItem,
-    sizeOptions,
-    handleSubmit: handleSizeSubmit
-  } = useLastSizes();
 
   useEffect(() => {
     setIsMounted(true);
@@ -47,6 +39,13 @@ export default function DashboardPage() {
       color: "bg-emerald-500/20 hover:bg-emerald-500/40 border-emerald-500/50",
     },
     {
+      label: "Stock Movements",
+      icon: FaArrowDownUpAcrossLine,
+      href: "/stock-movements",
+      guestAllowed: false,
+      color: "bg-teal-500/20 hover:bg-teal-500/40 border-teal-500/50",
+    },
+    {
       label: "Customers",
       icon: FaUsers,
       href: "/customers",
@@ -54,11 +53,18 @@ export default function DashboardPage() {
       color: "bg-orange-500/20 hover:bg-orange-500/40 border-orange-500/50",
     },
     {
-      label: "Locations",
-      icon: FaLocationArrow,
-      href: "/locations",
+      label: "Departments",
+      icon: FaBuilding,
+      href: "/departments",
       guestAllowed: true,
       color: "bg-pink-500/20 hover:bg-pink-500/40 border-pink-500/50",
+    },
+    {
+      label: "Last Models",
+      icon: FaCube,
+      href: "/last-models",
+      guestAllowed: true,
+      color: "bg-indigo-500/20 hover:bg-indigo-500/40 border-indigo-500/50",
     },
     {
       label: "Last Names",
@@ -73,21 +79,7 @@ export default function DashboardPage() {
       href: "/last-sizes",
       guestAllowed: true,
       color: "bg-fuchsia-500/20 hover:bg-fuchsia-500/40 border-fuchsia-500/50",
-    },
-    {
-      label: "Departments",
-      icon: FaBuilding,
-      href: "/departments",
-      guestAllowed: true,
-      color: "bg-emerald-500/20 hover:bg-emerald-500/40 border-emerald-500/50",
-    },
-    {
-      label: "Stock Movements",
-      icon: FaArrowDownUpAcrossLine,
-      href: "/stock-movements",
-      guestAllowed: false,
-      color: "bg-emerald-500/20 hover:bg-emerald-500/40 border-emerald-500/50",
-    },
+    }
   ];
 
   if (!isMounted) {
@@ -139,16 +131,15 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      {/* Main Content */}
       <div className={dashboardStyles.content.container}>
         <div className={dashboardStyles.content.welcomeSection}>
           <h2 className={dashboardStyles.content.welcomeTitle}>Welcome Manager</h2>
-          <p className={dashboardStyles.content.subTitle}>Space Theme Management Dashboard</p>
+          <p className={dashboardStyles.content.subTitle}>What do you want to do?</p>
           <div className={dashboardStyles.content.divider} />
         </div>
 
         <div className="w-full">
-          <h3 className={dashboardStyles.content.actionTitle}>What do you want to do?</h3>
+          <h3 className={dashboardStyles.content.actionTitle}>System Modules</h3>
           
           <div className={dashboardStyles.content.grid}>
             {actions.map((action, index) => {
@@ -168,19 +159,23 @@ export default function DashboardPage() {
         </div>
       </div>
 
+      <div>
+        <h3 className="text-center text-3xl text-white uppercase tracking-[0.2em] mb-8 font-grotesk font-bold my-10">REPORT</h3>
+      </div>
+      
+      <div className="w-full mb-10">
+             <InventoryMatrixTable />
+      </div>
+
       <footer className={dashboardStyles.footer}>
         <p>© 2024 Last Management System. All systems operational.</p>
       </footer>
 
       <LoginModal isOpen={isLoginOpen} onClose={() => setIsLoginOpen(false)} />
 
-      <LastSizeModal
-        mode={modalMode}
-        item={selectedItem}
-        sizeOptions={sizeOptions}
-        onClose={() => setModalMode(null)}
-        onSubmit={handleSizeSubmit}
-      />
+      {/* Modal này ở Dashboard có thể bỏ hoặc giữ nếu muốn tạo nhanh Size từ Dashboard,
+          nhưng logic đã phức tạp hơn nên tốt nhất vào trang Last Sizes */}
+      {/* <LastSizeModal ... /> */}
     </main>
   );
 }

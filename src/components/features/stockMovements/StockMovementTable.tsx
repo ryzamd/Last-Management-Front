@@ -1,5 +1,5 @@
-import { StockMovementDto } from '@/services/stockMovement.service';
 import { stockMovementStyles as styles } from '@/styles/stockMovement.styles';
+import { StockMovementDto } from '@/types/stockMovement';
 import { FaEye } from "react-icons/fa6";
 
 interface Props {data: StockMovementDto[]; onView: (item: StockMovementDto) => void;}

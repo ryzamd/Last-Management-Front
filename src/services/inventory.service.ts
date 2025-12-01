@@ -2,9 +2,9 @@ import axiosInstance from '@/lib/axios';
 import { AdjustStockRequest, InventoryItem, PagedResult } from '@/types/inventory';
 
 export const InventoryService = {
-  getAll: async (page: number, pageSize: number, locationId?: string): Promise<PagedResult<InventoryItem>> => {
+  getAll: async (page: number, pageSize: number, departmentId?: string): Promise<PagedResult<InventoryItem>> => {
     const params: any = { page, pageSize };
-    if (locationId) params.locationId = locationId;
+    if (departmentId) params.departmentId = departmentId;
     
     const response = await axiosInstance.get('/InventoryStocks', { params });
     return response.data;

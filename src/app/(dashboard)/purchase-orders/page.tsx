@@ -16,13 +16,11 @@ export default function PurchaseOrdersPage() {
     pageSize, setPageSize,
     statusFilter, setStatusFilter,
     isAdmin,
-    
     selectedOrder,
     isDetailOpen,
-    
+    isLoadingDetail,
     actionModal,
     isProcessing,
-    
     handleOpenDetail,
     handleCloseDetail,
     handleConfirm,
@@ -122,12 +120,13 @@ export default function PurchaseOrdersPage() {
         order={selectedOrder}
         isAdmin={isAdmin}
         isProcessing={isProcessing}
+        isLoadingData={isLoadingDetail}
         onClose={handleCloseDetail}
         onConfirm={handleConfirm}
         onDeny={handleDeny}
       />
 
-      {/* Action Modal (New) */}
+      {/* Action Modal */}
       <OrderActionModal
         isOpen={actionModal.isOpen}
         type={actionModal.type}
